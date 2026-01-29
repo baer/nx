@@ -7,6 +7,7 @@ import {
 import { dirname, join } from 'node:path';
 import runCommandsImpl from 'nx/src/executors/run-commands/run-commands.impl';
 import { getExcludeTasks } from './get-exclude-task';
+import { buildGradleArgs } from './build-gradle-args';
 
 export default async function gradleExecutor(
   options: GradleExecutorSchema,
@@ -24,39 +25,7 @@ export default async function gradleExecutor(
   ); // find gradlew near project root
   gradlewPath = join(context.root, gradlewPath);
 
-  let args =
-    typeof options.args === 'string'
-      ? options.args.trim().split(' ')
-      : Array.isArray(options.args)
-        ? options.args
-        : [];
-  if (options.testClassName) {
-    args.push(`--tests`, options.testClassName);
-  }
-
-  // Skip Gradle caching since we use Nx caching
-  args.push('--rerun-tasks');
-
-  // Pass any additional options not defined in the schema as gradle arguments
-  const knownOptions = new Set([
-    'taskName',
-    'testClassName',
-    'args',
-    'excludeDependsOn',
-    'includeDependsOnTasks',
-    '__unparsed__',
-  ]);
-  Object.entries(options).forEach(([key, value]) => {
-    if (!knownOptions.has(key) && value !== undefined && value !== false) {
-      if (value === true) {
-        // Boolean flags like --continuous
-        args.push(`--${key}`);
-      } else {
-        // Flags with values like --max-workers=4
-        args.push(`--${key}=${value}`);
-      }
-    }
-  });
+  const args = buildGradleArgs(options);
 
   if (options.excludeDependsOn) {
     const includeDependsOnTasks = new Set(options.includeDependsOnTasks ?? []);

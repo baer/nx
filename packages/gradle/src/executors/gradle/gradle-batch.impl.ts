@@ -27,8 +27,7 @@ import {
   getGradleTaskNameWithNxTaskId,
 } from './get-exclude-task';
 import { GradlePluginOptions } from '../../plugin/utils/gradle-plugin-options';
-
-const gradleSchema = require('./schema.json');
+import { buildGradleArgs, filterUnparsedOverrides } from './build-gradle-args';
 
 export const batchRunnerPath = join(
   __dirname,
@@ -57,19 +56,9 @@ export default async function gradleBatch(
 
     // set args with passed in args and overrides in command line
     const input = inputs[taskGraph.roots[0]];
-
-    let args =
-      typeof input.args === 'string'
-        ? input.args.trim().split(' ')
-        : Array.isArray(input.args)
-          ? input.args
-          : [];
+    const args = buildGradleArgs(input);
     if (overrides.__overrides_unparsed__.length) {
-      const schemaFields = Object.keys(gradleSchema.properties);
-      const filteredOverrides = overrides.__overrides_unparsed__.filter(
-        (arg) => !schemaFields.some((field) => arg.startsWith(`--${field}`))
-      );
-      args.push(...filteredOverrides);
+      args.push(...filterUnparsedOverrides(overrides.__overrides_unparsed__));
     }
 
     const taskIds = Object.keys(taskGraph.tasks);
