@@ -5,4 +5,6 @@ export interface GradleExecutorSchema {
   excludeDependsOn: boolean;
   includeDependsOnTasks?: string[];
   __unparsed__?: string[];
+  debugMode?: boolean;
+  debugPort?: number;
 }

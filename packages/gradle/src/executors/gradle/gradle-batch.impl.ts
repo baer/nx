@@ -81,7 +81,9 @@ export default async function gradleBatch(
       excludeTasks,
       excludeTestTasks,
       args,
-      root
+      root,
+      input.debugMode,
+      input.debugPort
     );
 
     taskIds.forEach((taskId) => {
@@ -185,14 +187,20 @@ async function runTasksInBatch(
   excludeTasks: Set<string>,
   excludeTestTasks: Set<string>,
   args: string[],
-  root: string
+  root: string,
+  debugMode?: boolean,
+  debugPort?: number
 ): Promise<BatchResults> {
   const gradlewBatchStart = performance.mark(`gradlew-batch:start`);
+
+  const debugArgs = debugMode
+    ? `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${debugPort ?? 5005}`
+    : '';
 
   const usePseudoTerminal =
     process.env.NX_NATIVE_COMMAND_RUNNER !== 'false' &&
     PseudoTerminal.isSupported();
-  const command = `java -jar ${batchRunnerPath} --tasks='${JSON.stringify(
+  const command = `java ${debugArgs} -jar ${batchRunnerPath} --tasks='${JSON.stringify(
     gradlewTasksToRun
   )}' --workspaceRoot=${root} --args='${args
     .join(' ')

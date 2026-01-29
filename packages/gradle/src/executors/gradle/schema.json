@@ -49,6 +49,16 @@
       },
       "description": "Additional arguments to pass to the gradle command (automatically populated by Nx).",
       "x-priority": "internal"
+    },
+    "debugMode": {
+      "type": "boolean",
+      "description": "Run the Gradle batch executor with Java debug agent enabled.",
+      "default": false
+    },
+    "debugPort": {
+      "type": "number",
+      "description": "The port to use for the Java debug agent.",
+      "default": 5005
     }
   },
   "required": ["taskName"]
