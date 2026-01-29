@@ -17,7 +17,7 @@ export function filterUnparsedOverrides(unparsedOverrides: string[]): string[] {
 export function buildGradleArgs(options: GradleExecutorSchema): string[] {
   let args =
     typeof options.args === 'string'
-      ? options.args.trim().split(' ')
+      ? options.args.trim().split(' ').filter(arg => arg.length > 0)
       : Array.isArray(options.args)
         ? options.args
         : [];
