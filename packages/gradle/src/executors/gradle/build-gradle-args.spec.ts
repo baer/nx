@@ -67,7 +67,7 @@ describe('buildGradleArgs', () => {
 
     const result = buildGradleArgs(options);
 
-    expect(result).toEqual(['', '--rerun-tasks']);
+    expect(result).toEqual(['--rerun-tasks']);
   });
 
   it('should handle empty array args', () => {
