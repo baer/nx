@@ -28,6 +28,8 @@ import {
 } from './get-exclude-task';
 import { GradlePluginOptions } from '../../plugin/utils/gradle-plugin-options';
 
+const gradleSchema = require('./schema.json');
+
 export const batchRunnerPath = join(
   __dirname,
   '../../../batch-runner/build/libs/batch-runner-all.jar'
@@ -63,7 +65,11 @@ export default async function gradleBatch(
           ? input.args
           : [];
     if (overrides.__overrides_unparsed__.length) {
-      args.push(...overrides.__overrides_unparsed__);
+      const schemaFields = Object.keys(gradleSchema.properties);
+      const filteredOverrides = overrides.__overrides_unparsed__.filter(
+        (arg) => !schemaFields.some((field) => arg.startsWith(`--${field}`))
+      );
+      args.push(...filteredOverrides);
     }
 
     const taskIds = Object.keys(taskGraph.tasks);
