@@ -1,7 +1,7 @@
 import { prompt } from 'enquirer';
 import { output } from '../../utils/output';
 import { ensurePackageHasProvenance } from '../../utils/provenance';
-import * as chalk from 'chalk';
+import * as pc from 'picocolors';
 
 import {
   Agent,
@@ -86,7 +86,7 @@ export async function configureAiAgentsHandlerImpl(
     output.log({
       title,
       bodyLines: [
-        chalk.dim(
+        pc.dim(
           'To manually configure the Nx MCP in your editor, install Nx Console (https://nx.dev/getting-started/editor-setup)'
         ),
       ],
@@ -224,10 +224,10 @@ export async function configureAiAgentsHandlerImpl(
           footer: function () {
             const focused = this.focused as AgentPromptChoice;
             if (focused.partial) {
-              return chalk.dim(focused.partialReason);
+              return pc.dim(focused.partialReason);
             }
             if (focused.agentConfiguration.outdated) {
-              return chalk.dim(
+              return pc.dim(
                 `  The rules file at ${focused.rulesDisplayPath} can be updated with the latest Nx recommendations`
               );
             }
@@ -235,7 +235,7 @@ export async function configureAiAgentsHandlerImpl(
               !focused.agentConfiguration.mcp &&
               !focused.agentConfiguration.rules
             ) {
-              return chalk.dim(
+              return pc.dim(
                 `  Configures agent rules at ${
                   focused.rulesDisplayPath
                 } and the Nx MCP server ${
