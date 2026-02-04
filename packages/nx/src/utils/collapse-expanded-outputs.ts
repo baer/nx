@@ -25,21 +25,36 @@ export function collapseExpandedOutputs(expandedOutputs: string[]) {
     }
   }
 
-  // Find a level in the tree that has too many outputs
   if (tree.length === 0) {
     return [];
   }
 
-  let j = 0;
-  let level = tree[j];
-  for (j = 0; j < tree.length; j++) {
-    level = tree[j];
-    if (level.size > MAX_OUTPUTS_TO_CHECK_HASHES) {
+  // Find collapse level: the level before the first level with too many outputs
+  let collapseLevel = tree.length - 1;
+  for (let j = 0; j < tree.length; j++) {
+    if (tree[j].size > MAX_OUTPUTS_TO_CHECK_HASHES) {
+      collapseLevel = Math.max(0, j - 1);
       break;
     }
   }
 
-  // Return the level before the level with too many outputs
-  // If the first level has too many outputs, return that one.
-  return Array.from(tree[Math.max(0, j - 1)]);
+  // Collect paths, preserving leaf paths that terminate before collapse level
+  const result = new Set<string>();
+
+  for (let level = 0; level <= collapseLevel; level++) {
+    for (const path of tree[level]) {
+      const nextLevel = tree[level + 1];
+      // Check if this path continues deeper in the tree
+      const continuesDeeper =
+        nextLevel &&
+        Array.from(nextLevel).some((child) => child.startsWith(path + '/'));
+
+      // Include path if it's at collapse level or doesn't continue deeper (leaf)
+      if (level === collapseLevel || !continuesDeeper) {
+        result.add(path);
+      }
+    }
+  }
+
+  return Array.from(result);
 }
